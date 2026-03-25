@@ -1,0 +1,24 @@
+2026/03/25-13:53:03.204 ffc Reusing MANIFEST C:\Users\tertu\AppData\Local\Temp\flutter_tools.3bf55434\flutter_tools_chrome_device.93978871\Default\WebStorage\2\IndexedDB\indexeddb.leveldb/MANIFEST-000001
+2026/03/25-13:53:03.205 ffc Recovering log #44
+2026/03/25-13:53:03.205 ffc Reusing old log C:\Users\tertu\AppData\Local\Temp\flutter_tools.3bf55434\flutter_tools_chrome_device.93978871\Default\WebStorage\2\IndexedDB\indexeddb.leveldb/000044.log 
+2026/03/25-13:53:03.528 3dd8 Level-0 table #49: started
+2026/03/25-13:53:03.534 3dd8 Level-0 table #49: 903 bytes OK
+2026/03/25-13:53:03.537 3dd8 Delete type=0 #44
+2026/03/25-13:53:03.539 ffc Manual compaction at level-0 from '\x00\x16\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x17\x00\x00\x00' @ 0 : 0; will stop at '\x00\x16\x00\x00\x05' @ 1272 : 1
+2026/03/25-13:53:03.540 ffc Compacting 1@0 + 1@1 files
+2026/03/25-13:53:03.544 ffc Generated table #50@0: 273 keys, 4851 bytes
+2026/03/25-13:53:03.544 ffc Compacted 1@0 + 1@1 files => 4851 bytes
+2026/03/25-13:53:03.545 ffc compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/03/25-13:53:03.547 ffc Delete type=2 #49
+2026/03/25-13:53:03.548 ffc Manual compaction at level-0 from '\x00\x16\x00\x00\x05' @ 1272 : 1 .. '\x00\x17\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/03/25-13:53:03.615 84c Level-0 table #52: started
+2026/03/25-13:53:03.619 84c Level-0 table #52: 525 bytes OK
+2026/03/25-13:53:03.621 84c Delete type=2 #46
+2026/03/25-13:53:03.621 84c Delete type=0 #48
+2026/03/25-13:53:03.622 3dd8 Manual compaction at level-0 from '\x00\x17\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x18\x00\x00\x00' @ 0 : 0; will stop at '\x00\x17\x00\x00\x05' @ 1291 : 1
+2026/03/25-13:53:03.623 3dd8 Compacting 1@0 + 1@1 files
+2026/03/25-13:53:03.629 3dd8 Generated table #53@0: 273 keys, 4857 bytes
+2026/03/25-13:53:03.629 3dd8 Compacted 1@0 + 1@1 files => 4857 bytes
+2026/03/25-13:53:03.630 3dd8 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/03/25-13:53:03.631 3dd8 Delete type=2 #52
+2026/03/25-13:53:03.632 ffc Manual compaction at level-0 from '\x00\x17\x00\x00\x05' @ 1291 : 1 .. '\x00\x18\x00\x00\x00' @ 0 : 0; will stop at (end)
