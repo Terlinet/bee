@@ -52,6 +52,11 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
   String? _chartSymbol;
   String? _chartInterval;
 
+  // Lista Top 15 integrada para contexto global e inteligência de mercado
+  final List<String> _topAssetsContext = [
+    "BTC", "ETH", "USDT", "SOL", "BNB", "XRP", "USDC", "DOGE", "ADA", "TRX", "STETH", "SHIB", "AVAX", "DOT", "LINK", "XMR", "PEPE"
+  ];
+
   late AnimationController _murmurationController;
   late AnimationController _swarmController;
   late List<BirdFlock> _flocks;
@@ -97,10 +102,10 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
   void _closeVideo() {
     setState(() {
       _showVideo = false;
-      _hasVideoBeenShown = true;
+      _hasVideoBeenShown = true; 
       _videoController.pause();
       _videoController.seekTo(Duration.zero);
-      _response = "Protocolo de orientação concluído. Deseja saber a tendência de alguma cripto ou ativo digital específico?";
+      _response = "Protocolo de orientação concluído. O Bee Agent está agora sincronizado com as Top 15 do mercado global (XRP, Monero, SOL...). O que deseja analisar?";
     });
   }
 
@@ -139,16 +144,27 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
 
   Future<void> _sendQuery() async {
     if (!_isAgentActive) return;
-    if (_controller.text.isEmpty) return;
     final String userText = _controller.text;
+    if (userText.isEmpty) return;
+    
     _controller.clear();
-    setState(() { _isLoading = true; _response = "Consultando enxame TerlineT..."; });
+    setState(() { 
+      _isLoading = true; 
+      _response = "O Bee está convocando o enxame para análise tática global..."; 
+    });
 
     try {
       final response = await http.post(
         Uri.parse('$hfSpaceUrl/query'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'text': userText, 'is_agent': true, 'consult_terlinet': true}),
+        body: jsonEncode({
+          'text': userText, 
+          'is_agent': true, 
+          'consult_terlinet': true,
+          'market_analysis': true,
+          'priority_watchlist': _topAssetsContext, // Envia as Top 15 para o backend
+          'real_time_sync': true
+        }),
       ).timeout(const Duration(seconds: 60));
       
       if (response.statusCode == 200) {
@@ -222,7 +238,7 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
                                     _showVideo = true;
                                     _videoController.play();
                                   } else {
-                                    _response = "Bee Agent Conectado. Deseja saber a tendência de alguma cripto?";
+                                    _response = "Bee Agent Conectado. Sincronizado com Top 15 e tendências globais.";
                                   }
                                 } else {
                                   _showVideo = false;
@@ -310,11 +326,11 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
         style: const TextStyle(color: Colors.white, fontSize: 18), 
         textAlign: TextAlign.center,
         decoration: InputDecoration(
-          hintText: 'FALE COM O BEE AGENT...', 
+          hintText: 'CONSULTAR QUALQUER ATIVO (XRP, XMR, SOL...)',
           hintStyle: TextStyle(color: Colors.redAccent.withOpacity(0.5), fontSize: 14), 
           border: InputBorder.none, 
           prefixIcon: IconButton(icon: Icon(_isListening ? Icons.mic : Icons.mic_none, color: _isListening ? Colors.redAccent : Colors.white), onPressed: _listen),
-          suffixIcon: IconButton(icon: const Icon(Icons.send, color: Colors.redAccent), onPressed: _sendQuery),
+          suffixIcon: IconButton(icon: const Icon(Icons.send, color: Colors.redAccent), onPressed: () => _sendQuery()),
         ), 
         onSubmitted: (_) => _sendQuery()
       )
@@ -540,19 +556,10 @@ class MurmurationPainter extends CustomPainter {
   MurmurationPainter(this.flocks, this.animationValue);
   @override void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    // Usamos o tempo absoluto para garantir um movimento infinito e sem saltos
     final double t = DateTime.now().millisecondsSinceEpoch / 2500.0; 
-
     for (int i = 0; i < 50; i++) {
-      final pos = center + Offset(
-        math.sin(t + i * 0.4) * 110, 
-        math.cos(t * 0.4 + i * 0.6) * 40
-      );
-      canvas.drawCircle(
-        pos, 
-        1.2, 
-        Paint()..color = Colors.white.withOpacity(0.25 + (math.sin(t + i).abs() * 0.3))
-      );
+      final pos = center + Offset(math.sin(t + i * 0.4) * 110, math.cos(t * 0.4 + i * 0.6) * 40);
+      canvas.drawCircle(pos, 1.2, Paint()..color = Colors.white.withOpacity(0.25 + (math.sin(t + i).abs() * 0.3)));
     }
   }
   @override bool shouldRepaint(covariant MurmurationPainter oldDelegate) => true;

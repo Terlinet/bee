@@ -1,0 +1,1 @@
+:  D:\\ANDROID_STUDIO\\mastertrader\\web\\index.html

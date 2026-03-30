@@ -1,8 +1,13 @@
-2026/03/25-18:28:35.717 4af8 Reusing MANIFEST C:\Users\tertu\AppData\Local\Temp\flutter_tools.2e82320a\flutter_tools_chrome_device.ebc3f718\Default\shared_proto_db/MANIFEST-000001
-2026/03/25-18:28:35.718 4af8 Recovering log #16
-2026/03/25-18:28:35.719 4af8 Reusing old log C:\Users\tertu\AppData\Local\Temp\flutter_tools.2e82320a\flutter_tools_chrome_device.ebc3f718\Default\shared_proto_db/000016.log 
-2026/03/25-18:28:35.720 4af8 Delete type=0 #3
-2026/03/25-18:28:35.720 4af8 Delete type=0 #4
-2026/03/25-18:28:35.720 4af8 Delete type=0 #7
-2026/03/25-18:28:35.720 4af8 Delete type=0 #10
-2026/03/25-18:28:35.720 4af8 Delete type=0 #13
+2026/03/30-13:39:08.969 537c Reusing MANIFEST C:\Users\tertu\AppData\Local\Temp\flutter_tools.224fbf05\flutter_tools_chrome_device.50a9dae3\Default\shared_proto_db/MANIFEST-000001
+2026/03/30-13:39:08.970 537c Recovering log #19
+2026/03/30-13:39:08.971 537c Reusing old log C:\Users\tertu\AppData\Local\Temp\flutter_tools.224fbf05\flutter_tools_chrome_device.50a9dae3\Default\shared_proto_db/000019.log 
+2026/03/30-13:39:08.971 537c Delete type=0 #3
+2026/03/30-13:39:08.972 537c Delete type=0 #4
+2026/03/30-13:39:08.972 537c Delete type=0 #7
+2026/03/30-13:39:08.972 537c Delete type=2 #8
+2026/03/30-13:39:08.972 537c Delete type=0 #10
+2026/03/30-13:39:08.972 537c Delete type=2 #11
+2026/03/30-13:39:08.972 537c Delete type=0 #13
+2026/03/30-13:39:08.972 537c Delete type=2 #14
+2026/03/30-13:39:08.972 537c Delete type=0 #16
+2026/03/30-13:39:08.972 537c Delete type=2 #17
