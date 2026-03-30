@@ -52,9 +52,8 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
   String? _chartSymbol;
   String? _chartInterval;
 
-  // Lista Top 15 integrada para contexto global e inteligência de mercado
-  final List<String> _topAssetsContext = [
-    "BTC", "ETH", "USDT", "SOL", "BNB", "XRP", "USDC", "DOGE", "ADA", "TRX", "STETH", "SHIB", "AVAX", "DOT", "LINK", "XMR", "PEPE"
+  final List<String> _priorityWatchlist = [
+    "BTC", "ETH", "BNB", "SOL", "XRP", "ADA", "DOGE", "SHIB", "AVAX", "DOT", "LINK", "TRX", "MATIC", "WBTC", "UNI", "XMR"
   ];
 
   late AnimationController _murmurationController;
@@ -62,7 +61,8 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
   late List<BirdFlock> _flocks;
   late List<BeeParticle> _swarmParticles;
 
-  late AudioPlayer _audioPlayer;
+  late AudioPlayer _audioPlayer; 
+  late AudioPlayer _swarmAudioPlayer; 
   late stt.SpeechToText _speech;
   bool _isListening = false;
   bool _isMuted = false;
@@ -77,14 +77,25 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
   void initState() {
     super.initState();
     _murmurationController = AnimationController(vsync: this, duration: const Duration(seconds: 20))..repeat();
-    _swarmController = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat();
+    _swarmController = AnimationController(vsync: this, duration: const Duration(seconds: 4));
     
     _flocks = List.generate(6, (index) => BirdFlock(index));
-    _swarmParticles = List.generate(40, (index) => BeeParticle());
+    _swarmParticles = List.generate(3500, (index) => BeeParticle(index)); 
     
     _audioPlayer = AudioPlayer();
+    _swarmAudioPlayer = AudioPlayer();
     _initSpeech();
     _initVideo();
+    _setupSwarmAudio();
+  }
+
+  Future<void> _setupSwarmAudio() async {
+    try {
+      await _swarmAudioPlayer.setAsset('assets/beeagent.mp3');
+      await _swarmAudioPlayer.setLoopMode(LoopMode.all);
+    } catch (e) {
+      debugPrint("Erro ao carregar som do enxame: $e");
+    }
   }
 
   void _initVideo() {
@@ -105,7 +116,7 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
       _hasVideoBeenShown = true; 
       _videoController.pause();
       _videoController.seekTo(Duration.zero);
-      _response = "Protocolo de orientação concluído. O Bee Agent está agora sincronizado com as Top 15 do mercado global (XRP, Monero, SOL...). O que deseja analisar?";
+      _response = "Protocolo de orientação concluído. O Bee Agent está sincronizado. O que deseja analisar?";
     });
   }
 
@@ -121,6 +132,7 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
     _swarmController.dispose();
     _controller.dispose();
     _audioPlayer.dispose();
+    _swarmAudioPlayer.dispose();
     _videoController.dispose();
     super.dispose();
   }
@@ -150,7 +162,7 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
     _controller.clear();
     setState(() { 
       _isLoading = true; 
-      _response = "O Bee está convocando o enxame para análise tática global..."; 
+      _response = "O Bee está convocando o enxame..."; 
     });
 
     try {
@@ -162,8 +174,8 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
           'is_agent': true, 
           'consult_terlinet': true,
           'market_analysis': true,
-          'priority_watchlist': _topAssetsContext, // Envia as Top 15 para o backend
-          'real_time_sync': true
+          'priority_watchlist': _priorityWatchlist,
+          'priority_sync': true
         }),
       ).timeout(const Duration(seconds: 60));
       
@@ -205,74 +217,131 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
     return Scaffold(
       body: Stack(
         children: [
+          // CAMADA 1: Fundo
           Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage('assets/trader.jpg'), fit: BoxFit.cover))),
           Container(color: Colors.black.withOpacity(0.5)),
+          
+          // CAMADA 2: Enxame (IgnorePointer garante que não bloqueie cliques)
+          IgnorePointer(child: _buildSwarmOverlay()),
+
+          // CAMADA 3: Header e Footer
           SafeArea(
-            child: Stack(
+            child: Column(
               children: [
-                Positioned(top: 15, left: 20, child: _buildHeader()),
-                Center(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (_showVideo && _isVideoInitialized) _buildHolographicVideo(),
-                        const SizedBox(height: 20),
-                        VirtualBeeAgent(
-                          isActive: _isAgentActive,
-                          onTap: () {
-                            if (_showVideo) {
-                              _closeVideo(); 
-                              setState(() => _isAgentActive = true);
-                            } else if (_isLoading) {
-                              setState(() {
-                                _isLoading = false;
-                                _response = "Análise interrompida. O que deseja saber?";
-                              });
-                            } else {
-                              setState(() {
-                                _isAgentActive = !_isAgentActive;
-                                if (_isAgentActive) {
-                                  if (!_hasVideoBeenShown) {
-                                    _showVideo = true;
-                                    _videoController.play();
-                                  } else {
-                                    _response = "Bee Agent Conectado. Sincronizado com Top 15 e tendências globais.";
-                                  }
-                                } else {
-                                  _showVideo = false;
-                                  _videoController.pause();
-                                  _audioPlayer.stop();
-                                  _response = "";
-                                  _chartSymbol = null;
-                                }
-                              });
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 30),
-                        AnimatedOpacity(
-                          duration: const Duration(milliseconds: 800),
-                          opacity: _isAgentActive ? 1.0 : 0.0,
-                          child: _isAgentActive ? Column(
-                            children: [
-                              _buildChatInput(),
-                              const SizedBox(height: 30),
-                              _buildResponseArea(),
-                            ],
-                          ) : const SizedBox.shrink(),
-                        ),
-                      ],
-                    ),
-                  ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 15, left: 20),
+                  child: Align(alignment: Alignment.topLeft, child: _buildHeader()),
                 ),
-                if (_isLoading) IgnorePointer(child: _buildSwarmOverlay()),
-                if (_chartSymbol != null) _buildChartOverlay(),
+                const Spacer(),
+                _buildFooter(),
+                const SizedBox(height: 10),
               ],
             ),
           ),
-          Positioned(bottom: 20, left: 0, right: 0, child: _buildFooter()),
+
+          // CAMADA 4: Agente e Vídeo (Posicionamento corrigido para clique certeiro)
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 250), 
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_showVideo && _isVideoInitialized) _buildHolographicVideo(),
+                  const SizedBox(height: 20),
+                  
+                  // Padding inferior empurra a hitbox para cima sem usar Transform quebrados
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 120),
+                    child: VirtualBeeAgent(
+                      isActive: _isAgentActive,
+                      onTap: () {
+                        if (_showVideo) {
+                          _closeVideo(); 
+                          setState(() => _isAgentActive = true);
+                          if (!_isMuted) _swarmAudioPlayer.play();
+                        } else if (_isLoading) {
+                          setState(() {
+                            _isLoading = false;
+                            _response = "Análise interrompida. O que deseja saber?";
+                          });
+                        } else {
+                          setState(() {
+                            _isAgentActive = !_isAgentActive;
+                            if (_isAgentActive) {
+                              _swarmController.forward(from: 0.0);
+                              if (!_isMuted) _swarmAudioPlayer.play();
+                              if (!_hasVideoBeenShown) {
+                                _showVideo = true;
+                                _videoController.play();
+                              } else {
+                                _response = "Bee Agent Conectado. Analisando tendências globais de ativos...";
+                              }
+                            } else {
+                              _showVideo = false;
+                              _videoController.pause();
+                              _audioPlayer.stop();
+                              _swarmAudioPlayer.stop();
+                              _response = "";
+                              _chartSymbol = null;
+                            }
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // CAMADA 5: CHAT E RESPOSTA (Sempre na frente)
+          Positioned(
+            bottom: 80,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 800),
+                opacity: _isAgentActive ? 1.0 : 0.0,
+                child: _isAgentActive ? Container(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildChatInput(),
+                      const SizedBox(height: 20),
+                      _buildResponseArea(),
+                    ],
+                  ),
+                ) : const SizedBox.shrink(),
+              ),
+            ),
+          ),
+
+          if (_chartSymbol != null) _buildChartOverlay(),
+          
+          // CAMADA 6: Controles de Áudio
+          Positioned(
+            bottom: 30,
+            right: 30,
+            child: FloatingActionButton(
+              mini: true,
+              backgroundColor: Colors.white10,
+              onPressed: () {
+                setState(() {
+                  _isMuted = !_isMuted;
+                  if (_isMuted) {
+                    _audioPlayer.stop();
+                    _swarmAudioPlayer.pause();
+                  } else if (_isAgentActive) {
+                    _swarmAudioPlayer.play();
+                  }
+                });
+              },
+              child: Icon(_isMuted ? Icons.volume_off : Icons.volume_up, color: Colors.white),
+            ),
+          ),
         ],
       ),
     );
@@ -313,10 +382,9 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
   Widget _buildChatInput() { 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      width: MediaQuery.of(context).size.width * 0.85,
       padding: const EdgeInsets.symmetric(horizontal: 24), 
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withOpacity(0.8),
         borderRadius: BorderRadius.circular(35),
         border: Border.all(color: Colors.redAccent.withOpacity(0.8), width: 2),
         boxShadow: [BoxShadow(color: Colors.redAccent.withOpacity(0.2), blurRadius: 15)]
@@ -326,7 +394,7 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
         style: const TextStyle(color: Colors.white, fontSize: 18), 
         textAlign: TextAlign.center,
         decoration: InputDecoration(
-          hintText: 'CONSULTAR QUALQUER ATIVO (XRP, XMR, SOL...)',
+          hintText: 'CONSULTAR QUALQUER ATIVO (XRP, XMR, SOL...)', 
           hintStyle: TextStyle(color: Colors.redAccent.withOpacity(0.5), fontSize: 14), 
           border: InputBorder.none, 
           prefixIcon: IconButton(icon: Icon(_isListening ? Icons.mic : Icons.mic_none, color: _isListening ? Colors.redAccent : Colors.white), onPressed: _listen),
@@ -340,9 +408,12 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
   Widget _buildResponseArea() { 
     if (_response.isEmpty) return const SizedBox.shrink(); 
     return Container(
-      width: MediaQuery.of(context).size.width * 0.85,
       padding: const EdgeInsets.all(24), 
-      decoration: BoxDecoration(color: Colors.black.withOpacity(0.4), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white.withOpacity(0.05))), 
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.7), 
+        borderRadius: BorderRadius.circular(24), 
+        border: Border.all(color: Colors.white.withOpacity(0.1))
+      ), 
       child: SelectableText(_response, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, height: 1.5))
     ); 
   }
@@ -377,8 +448,11 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
 
   Widget _buildSwarmOverlay() {
     return AnimatedBuilder(
-      animation: _swarmController,
-      builder: (context, child) => CustomPaint(painter: SwarmPainter(_swarmParticles, _swarmController.value, _isAgentActive, _isLoading), size: Size.infinite),
+      animation: Listenable.merge([_swarmController, _murmurationController]),
+      builder: (context, child) => CustomPaint(
+        painter: SwarmPainter(_swarmParticles, _swarmController.value, _isAgentActive, _isLoading), 
+        size: Size.infinite
+      ),
     );
   }
 
@@ -412,75 +486,102 @@ class MyCustomSource extends StreamAudioSource {
 }
 
 class BeeParticle {
-  late double startSide, startY, orbitRadiusX, orbitRadiusY, speed, phase, scaleBase, noiseOffset, arrivalDelay;
-  BeeParticle() {
+  final int index;
+  late double orbitRadiusX, orbitRadiusY, speed, phase, scaleBase, noiseOffset, arrivalDelay;
+  late double offsetPhase; 
+  late double sizeFactor;
+  late double startSide, startY; 
+
+  BeeParticle(this.index) {
     final rand = math.Random();
-    startSide = rand.nextBool() ? 0 : 1;
+    startSide = rand.nextBool() ? 0 : 1; 
     startY = rand.nextDouble();
-    orbitRadiusX = 80 + rand.nextDouble() * 100;
-    orbitRadiusY = 40 + rand.nextDouble() * 60;
-    speed = 0.6 + rand.nextDouble() * 1.2;
+    orbitRadiusX = 100 + rand.nextDouble() * 130;
+    orbitRadiusY = 50 + rand.nextDouble() * 90;
+    speed = 0.4 + rand.nextDouble() * 0.8;
     phase = rand.nextDouble() * 2 * math.pi;
-    scaleBase = 0.25 + rand.nextDouble() * 0.3;
-    noiseOffset = rand.nextDouble() * 1000;
-    arrivalDelay = rand.nextDouble();
+    scaleBase = 0.12 + rand.nextDouble() * 0.18;
+    noiseOffset = rand.nextDouble() * 5000;
+    arrivalDelay = rand.nextDouble() * 0.8;
+    offsetPhase = (index / 3500.0) * math.pi * 2; 
+    sizeFactor = 0.3 + rand.nextDouble() * 0.7;
   }
 }
 
 class SwarmPainter extends CustomPainter {
   final List<BeeParticle> particles;
-  final double value;
+  final double entryValue; 
   final bool isAgent;
   final bool isLoading;
-  SwarmPainter(this.particles, this.value, this.isAgent, this.isLoading);
+  SwarmPainter(this.particles, this.entryValue, this.isAgent, this.isLoading);
+
   @override
   void paint(Canvas canvas, Size size) {
-    final beeCenter = Offset(size.width / 2, size.height / 2 - 40);
-    final sortedEntries = particles.map((p) {
-      final multiplier = isLoading ? 2.5 : 1.0;
-      final angle = (value * 2 * math.pi * p.speed * multiplier) + p.phase;
-      final z = math.sin(angle);
-      return MapEntry(p, z);
-    }).toList();
-    sortedEntries.sort((a, b) => a.value.compareTo(b.value));
-    for (var entry in sortedEntries) {
-      final p = entry.key;
-      final z = entry.value;
-      final multiplier = isLoading ? 2.5 : 1.0;
-      final angle = (value * 2 * math.pi * p.speed * multiplier) + p.phase;
-      final startX = p.startSide == 0 ? -120.0 : size.width + 120.0;
-      final startY = p.startY * size.height;
-      final startPos = Offset(startX, startY);
-      final noiseX = math.sin(value * 20 + p.noiseOffset) * 6;
-      final noiseY = math.cos(value * 15 + p.noiseOffset) * 6;
-      final orbitPos = beeCenter + Offset(math.cos(angle) * p.orbitRadiusX + noiseX, math.sin(angle) * p.orbitRadiusY + noiseY);
-      double individualValue = (value + p.arrivalDelay) % 1.0;
-      double entryProgress = (individualValue * 2.5).clamp(0.0, 1.0);
-      final currentPos = Offset.lerp(startPos, orbitPos, entryProgress)!;
-      final scale = p.scaleBase * (1.2 + z * 0.4);
-      final finalOpacity = (0.3 + (z + 1) / 2 * 0.7).clamp(0.1, 1.0);
-      _drawMiniBee(canvas, currentPos, scale, isAgent, angle, finalOpacity, z);
+    final double time = DateTime.now().millisecondsSinceEpoch / 2500.0;
+    
+    // Órbita ajustada para coincidir com o Agent lá no alto
+    final beeAgentPos = Offset(size.width / 2, size.height / 2 - 250);
+
+    if (!isAgent) {
+      final List<Offset> points = [];
+      final Paint paint = Paint()..strokeCap = StrokeCap.round;
+
+      for (var p in particles) {
+        final double individualTime = time - (p.index * 0.0002);
+        final waveX = (math.sin(individualTime * 0.6) * math.cos(individualTime * 0.3) * 0.45 + 0.5) * size.width;
+        final waveY = (math.cos(individualTime * 0.5) * math.sin(individualTime * 0.4) * 0.4 + 0.4) * size.height;
+        final cloudDensity = math.sin(individualTime * 2 + p.index * 0.01).abs() * 20;
+        final localOffset = Offset(
+          math.sin(individualTime * 3 + p.noiseOffset * 0.001) * (40 + cloudDensity) * p.sizeFactor,
+          math.cos(individualTime * 2.5 + p.noiseOffset * 0.001) * (30 + cloudDensity) * p.sizeFactor
+        );
+        points.add(Offset(waveX, waveY) + localOffset);
+      }
+      paint.color = Colors.yellowAccent.withOpacity(0.35);
+      paint.strokeWidth = 2.2;
+      canvas.drawPoints(ui.PointMode.points, points, paint);
+      
+    } else {
+      final detailedParticles = particles.take(450).toList();
+      final sortedEntries = detailedParticles.map((p) {
+        final angle = (time * p.speed) + p.phase;
+        return MapEntry(p, math.sin(angle));
+      }).toList();
+      sortedEntries.sort((a, b) => a.value.compareTo(b.value));
+
+      for (var entry in sortedEntries) {
+        final p = entry.key;
+        final z = entry.value;
+        final startX = p.startSide == 0 ? -200.0 : size.width + 200.0;
+        final startPos = Offset(startX, p.startY * size.height);
+        final multiplier = isLoading ? 2.5 : 1.0;
+        final orbitTime = (time * p.speed * multiplier) + p.phase;
+        final orbitPos = beeAgentPos + Offset(math.cos(orbitTime) * p.orbitRadiusX, math.sin(orbitTime) * p.orbitRadiusY);
+        
+        double progress = (entryValue * 2.5 - p.arrivalDelay).clamp(0.0, 1.0);
+        final currentPos = Offset.lerp(startPos, orbitPos, progress)!;
+        
+        _drawMiniBee(canvas, currentPos, p.scaleBase * (1.3 + z * 0.5), true, orbitTime + math.pi/2, (0.4 + (z + 1) / 2 * 0.6).clamp(0.1, 1.0), z);
+      }
     }
   }
+
   void _drawMiniBee(Canvas canvas, Offset center, double scale, bool isActive, double angle, double opacity, double z) {
     canvas.save();
     canvas.translate(center.dx, center.dy);
-    canvas.rotate(angle + math.pi/2 + (z * 0.2));
+    canvas.rotate(angle + math.pi/2);
     canvas.scale(scale);
     final baseColor = isActive ? Colors.redAccent : Colors.yellowAccent;
     final secondaryColor = isActive ? Colors.red.shade900 : Colors.orange.shade800;
-    final wingFlap = math.sin(value * 80 + angle) * 0.6;
-    final wingPaint = Paint()..color = (isActive ? Colors.redAccent : Colors.white).withOpacity(0.4 * opacity)..style = PaintingStyle.fill;
+    final wingPaint = Paint()..color = Colors.white.withOpacity(0.4 * opacity)..style = PaintingStyle.fill;
+    final wingFlap = math.sin(DateTime.now().millisecondsSinceEpoch * 0.1) * 0.8;
     canvas.save(); canvas.rotate(wingFlap - 0.4); canvas.drawOval(Rect.fromLTWH(-15, -10, 15, 8), wingPaint); canvas.restore();
     canvas.save(); canvas.rotate(-wingFlap + 0.4); canvas.drawOval(Rect.fromLTWH(0, -10, 15, 8), wingPaint); canvas.restore();
-    final brightness = (z + 1) / 2;
-    final bodyPaint = Paint()..shader = ui.Gradient.radial(Offset.zero, 12, [Color.lerp(Colors.black, baseColor, 0.5 + brightness * 0.5)!, Color.lerp(Colors.black, secondaryColor, 0.3 + brightness * 0.7)!, Colors.black], const [0.2, 0.8, 1.0]);
+    final bodyPaint = Paint()..shader = ui.Gradient.radial(Offset.zero, 12, [Color.lerp(Colors.black, baseColor, 0.5 + (z+1)*0.25)!, Color.lerp(Colors.black, secondaryColor, 0.3 + (z+1)*0.35)!, Colors.black], const [0.2, 0.8, 1.0]);
     canvas.drawOval(Rect.fromCenter(center: Offset.zero, width: 24, height: 18), bodyPaint);
-    final stripePaint = Paint()..color = Colors.black.withOpacity(0.8 * opacity)..style = PaintingStyle.stroke..strokeWidth = 2;
-    canvas.drawArc(Rect.fromCenter(center: Offset.zero, width: 24, height: 18), 0.5, 2.2, false, stripePaint);
-    canvas.drawArc(Rect.fromCenter(center: Offset.zero, width: 24, height: 18), 3.5, 2.2, false, stripePaint);
     canvas.restore();
   }
+
   @override bool shouldRepaint(covariant SwarmPainter oldDelegate) => true;
 }
 
@@ -504,18 +605,25 @@ class _VirtualBeeAgentState extends State<VirtualBeeAgent> with TickerProviderSt
   void dispose() { _hoverController.dispose(); _wingController.dispose(); super.dispose(); }
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: AnimatedBuilder(
-        animation: _hoverController,
-        builder: (context, child) {
-          final t = _hoverController.value * 2 * math.pi;
-          return Transform.translate(
-            offset: Offset(math.sin(t) * 15, math.sin(2 * t) * 10),
-            child: SizedBox(width: 130, height: 130, child: CustomPaint(painter: BeePainter(wingValue: _wingController.value, isActive: widget.isActive))),
-          );
-        },
-      ),
+    return AnimatedBuilder(
+      animation: _hoverController,
+      builder: (context, child) {
+        final t = _hoverController.value * 2 * math.pi;
+        // O GestureDetector agora envolve a abelha em sua posição flutuante real
+        return Transform.translate(
+          offset: Offset(math.sin(t) * 15, math.sin(2 * t) * 10),
+          child: GestureDetector(
+            onTap: widget.onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: 130, 
+              height: 130, 
+              color: Colors.transparent,
+              child: CustomPaint(painter: BeePainter(wingValue: _wingController.value, isActive: widget.isActive)),
+            ),
+          ),
+        );
+      },
     );
   }
 }
