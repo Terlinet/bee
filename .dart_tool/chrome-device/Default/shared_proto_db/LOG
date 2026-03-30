@@ -1,21 +1,24 @@
-2026/03/30-18:35:38.505 4d58 Reusing MANIFEST C:\Users\tertu\AppData\Local\Temp\flutter_tools.a1da42c3\flutter_tools_chrome_device.b464c5f5\Default\shared_proto_db/MANIFEST-000001
-2026/03/30-18:35:38.506 4d58 Recovering log #32
-2026/03/30-18:35:38.511 4d58 Reusing old log C:\Users\tertu\AppData\Local\Temp\flutter_tools.a1da42c3\flutter_tools_chrome_device.b464c5f5\Default\shared_proto_db/000032.log 
-2026/03/30-18:35:38.511 4d58 Delete type=0 #3
-2026/03/30-18:35:38.511 4d58 Delete type=0 #4
-2026/03/30-18:35:38.511 4d58 Delete type=0 #7
-2026/03/30-18:35:38.511 4d58 Delete type=2 #8
-2026/03/30-18:35:38.511 4d58 Delete type=0 #10
-2026/03/30-18:35:38.511 4d58 Delete type=2 #11
-2026/03/30-18:35:38.512 4d58 Delete type=0 #13
-2026/03/30-18:35:38.512 4d58 Delete type=2 #14
-2026/03/30-18:35:38.513 4d58 Delete type=0 #16
-2026/03/30-18:35:38.513 4d58 Delete type=2 #17
-2026/03/30-18:35:38.513 4d58 Delete type=0 #19
-2026/03/30-18:35:38.513 4d58 Delete type=2 #21
-2026/03/30-18:35:38.513 4d58 Delete type=0 #23
-2026/03/30-18:35:38.513 4d58 Delete type=2 #24
-2026/03/30-18:35:38.513 4d58 Delete type=0 #26
-2026/03/30-18:35:38.513 4d58 Delete type=2 #27
-2026/03/30-18:35:38.513 4d58 Delete type=0 #29
-2026/03/30-18:35:38.513 4d58 Delete type=2 #30
+2026/03/30-20:21:16.037 523c Reusing MANIFEST C:\Users\tertu\AppData\Local\Temp\flutter_tools.54349500\flutter_tools_chrome_device.45d4d700\Default\shared_proto_db/MANIFEST-000001
+2026/03/30-20:21:16.038 523c Recovering log #32
+2026/03/30-20:21:16.040 523c Reusing old log C:\Users\tertu\AppData\Local\Temp\flutter_tools.54349500\flutter_tools_chrome_device.45d4d700\Default\shared_proto_db/000032.log 
+2026/03/30-20:21:16.040 523c Delete type=0 #3
+2026/03/30-20:21:16.040 523c Delete type=0 #4
+2026/03/30-20:21:16.040 523c Delete type=0 #7
+2026/03/30-20:21:16.040 523c Delete type=2 #8
+2026/03/30-20:21:16.040 523c Delete type=0 #10
+2026/03/30-20:21:16.040 523c Delete type=2 #11
+2026/03/30-20:21:16.040 523c Delete type=0 #13
+2026/03/30-20:21:16.040 523c Delete type=2 #14
+2026/03/30-20:21:16.041 523c Delete type=0 #16
+2026/03/30-20:21:16.041 523c Delete type=2 #17
+2026/03/30-20:21:16.041 523c Delete type=0 #19
+2026/03/30-20:21:16.041 523c Delete type=2 #21
+2026/03/30-20:21:16.041 523c Delete type=0 #23
+2026/03/30-20:21:16.041 523c Delete type=2 #24
+2026/03/30-20:21:16.041 523c Delete type=0 #26
+2026/03/30-20:21:16.041 523c Delete type=2 #27
+2026/03/30-20:21:16.042 523c Delete type=0 #29
+2026/03/30-20:21:16.042 523c Delete type=2 #30
+2026/03/30-20:21:30.156 429c Level-0 table #37: started
+2026/03/30-20:21:30.167 429c Level-0 table #37: 130764 bytes OK
+2026/03/30-20:21:30.183 429c Delete type=0 #32

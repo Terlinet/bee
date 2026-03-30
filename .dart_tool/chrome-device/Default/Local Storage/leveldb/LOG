@@ -1,6 +1,8 @@
-2026/03/30-18:35:38.462 4724 Reusing MANIFEST C:\Users\tertu\AppData\Local\Temp\flutter_tools.a1da42c3\flutter_tools_chrome_device.b464c5f5\Default\Local Storage\leveldb/MANIFEST-000001
-2026/03/30-18:35:38.476 4724 Recovering log #11
-2026/03/30-18:35:38.479 4724 Reusing old log C:\Users\tertu\AppData\Local\Temp\flutter_tools.a1da42c3\flutter_tools_chrome_device.b464c5f5\Default\Local Storage\leveldb/000011.log 
-2026/03/30-18:35:38.480 4724 Delete type=0 #3
-2026/03/30-18:35:38.480 4724 Delete type=0 #4
-2026/03/30-18:35:38.481 4724 Delete type=0 #7
+2026/03/30-20:21:15.900 22e8 Reusing MANIFEST C:\Users\tertu\AppData\Local\Temp\flutter_tools.54349500\flutter_tools_chrome_device.45d4d700\Default\Local Storage\leveldb/MANIFEST-000001
+2026/03/30-20:21:15.916 22e8 Recovering log #11
+2026/03/30-20:21:15.916 22e8 Level-0 table #13: started
+2026/03/30-20:21:15.925 22e8 Level-0 table #13: 26519 bytes OK
+2026/03/30-20:21:15.930 22e8 Delete type=0 #3
+2026/03/30-20:21:15.930 22e8 Delete type=0 #4
+2026/03/30-20:21:15.930 22e8 Delete type=0 #7
+2026/03/30-20:21:15.931 22e8 Delete type=0 #11

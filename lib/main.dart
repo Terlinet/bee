@@ -221,10 +221,10 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
           Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage('assets/trader.jpg'), fit: BoxFit.cover))),
           Container(color: Colors.black.withOpacity(0.5)),
           
-          // CAMADA 2: Enxame (IgnorePointer garante que não bloqueie cliques)
+          // CAMADA 2: Enxame
           IgnorePointer(child: _buildSwarmOverlay()),
 
-          // CAMADA 3: Header e Footer
+          // CAMADA 3: Header e Footer (Fixo)
           SafeArea(
             child: Column(
               children: [
@@ -239,20 +239,20 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
             ),
           ),
 
-          // CAMADA 4: Agente e Vídeo (Posicionamento corrigido para clique certeiro)
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 250), 
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (_showVideo && _isVideoInitialized) _buildHolographicVideo(),
-                  const SizedBox(height: 20),
-                  
-                  // Padding inferior empurra a hitbox para cima sem usar Transform quebrados
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 120),
-                    child: VirtualBeeAgent(
+          // CAMADA 4: Conteúdo Principal Scrollável
+          Positioned.fill(
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 120), // Espaço para não bater no Header
+                    
+                    if (_showVideo && _isVideoInitialized) _buildHolographicVideo(),
+                    
+                    const SizedBox(height: 40),
+                    
+                    VirtualBeeAgent(
                       isActive: _isAgentActive,
                       onTap: () {
                         if (_showVideo) {
@@ -288,33 +288,26 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
                         }
                       },
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+                    
+                    const SizedBox(height: 40),
 
-          // CAMADA 5: CHAT E RESPOSTA (Sempre na frente)
-          Positioned(
-            bottom: 80,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 800),
-                opacity: _isAgentActive ? 1.0 : 0.0,
-                child: _isAgentActive ? Container(
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildChatInput(),
-                      const SizedBox(height: 20),
-                      _buildResponseArea(),
-                    ],
-                  ),
-                ) : const SizedBox.shrink(),
+                    // CAMADA 5 Integrada: CHAT E RESPOSTA
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 800),
+                      opacity: _isAgentActive ? 1.0 : 0.0,
+                      child: _isAgentActive ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildChatInput(),
+                          const SizedBox(height: 20),
+                          _buildResponseArea(),
+                        ],
+                      ) : const SizedBox.shrink(),
+                    ),
+                    
+                    const SizedBox(height: 150), // Padding extra para scroll no final
+                  ],
+                ),
               ),
             ),
           ),
@@ -380,8 +373,8 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
   }
 
   Widget _buildChatInput() { 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 600),
       padding: const EdgeInsets.symmetric(horizontal: 24), 
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.8),
@@ -408,6 +401,7 @@ class _TerlineTPageState extends State<TerlineTPage> with TickerProviderStateMix
   Widget _buildResponseArea() { 
     if (_response.isEmpty) return const SizedBox.shrink(); 
     return Container(
+      constraints: const BoxConstraints(maxWidth: 800),
       padding: const EdgeInsets.all(24), 
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.7), 
@@ -519,7 +513,6 @@ class SwarmPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final double time = DateTime.now().millisecondsSinceEpoch / 2500.0;
     
-    // Órbita ajustada para coincidir com o Agent lá no alto
     final beeAgentPos = Offset(size.width / 2, size.height / 2 - 250);
 
     if (!isAgent) {
@@ -609,7 +602,6 @@ class _VirtualBeeAgentState extends State<VirtualBeeAgent> with TickerProviderSt
       animation: _hoverController,
       builder: (context, child) {
         final t = _hoverController.value * 2 * math.pi;
-        // O GestureDetector agora envolve a abelha em sua posição flutuante real
         return Transform.translate(
           offset: Offset(math.sin(t) * 15, math.sin(2 * t) * 10),
           child: GestureDetector(
